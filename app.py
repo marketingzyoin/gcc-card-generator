@@ -12,7 +12,7 @@ CORS(app)
 ZONE_LEFT   = 106
 ZONE_TOP    = 415
 ZONE_RIGHT  = 490
-ZONE_BOTTOM = 913
+ZONE_BOTTOM = 898
 ZONE_W      = ZONE_RIGHT - ZONE_LEFT   # 384px
 ZONE_H      = ZONE_BOTTOM - ZONE_TOP   # 498px
 BADGE_BG    = (142, 110, 157)          # Purple background color
