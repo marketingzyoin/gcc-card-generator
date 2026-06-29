@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I'm Attending — GCC Workplace Innovation Summit & Awards 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+    background: #120824;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 3rem;
+    color: #fff;
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header .tagline {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c084fc;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+  }
+  .header h1 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+  }
+  .header p {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ── Steps indicator ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 2rem;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .step-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    transition: all 0.3s;
+  }
+  .step-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .step.active .step-num { background: #7c3aed; border-color: #a855f7; color: #fff; }
+  .step.active .step-label { color: #c084fc; }
+  .step.done .step-num { background: #15803d; border-color: #22c55e; color: #fff; }
+  .step.done .step-label { color: #86efac; }
+  .step-line {
+    width: 48px; height: 1.5px;
+    background: rgba(255,255,255,0.12);
+    margin-bottom: 18px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 2rem 1.75rem;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* ── Upload zone ── */
+  .upload-zone {
+    border: 2px dashed rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    margin-bottom: 1.25rem;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: #a855f7;
+    background: rgba(168,85,247,0.07);
+  }
+  .upload-zone input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 2.8rem; margin-bottom: 0.8rem; display: block; }
+  .upload-zone h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.35rem; }
+  .upload-zone p { font-size: 0.8rem; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+  /* ── Preview ── */
+  .preview-wrap { display: none; text-align: center; margin-bottom: 1.25rem; }
+  .preview-wrap img {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #a855f7;
+    margin-bottom: 0.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .preview-wrap .change-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* ── Generate button ── */
+  .btn-generate {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #6d28d9, #a855f7);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.02em;
+  }
+  .btn-generate:hover:not(:disabled) { opacity: 0.88; }
+  .btn-generate:active:not(:disabled) { transform: scale(0.98); }
+  .btn-generate:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── Status ── */
+  .status {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    min-height: 1.4rem;
+    line-height: 1.5;
+  }
+  .status.error { color: #f87171; }
+
+  /* ── Progress bar ── */
+  .progress-wrap {
+    display: none;
+    margin-top: 1rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6d28d9, #a855f7);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Result ── */
+  .result-section {
+    display: none;
+    margin-top: 2rem;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+  }
+  .result-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e9d5ff;
+    margin-bottom: 1rem;
+  }
+  .result-section img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2.25rem;
+    border-radius: 12px;
+    background: #15803d;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    margin-bottom: 1rem;
+  }
+  .btn-download:hover { opacity: 0.88; }
+  .btn-another {
+    display: block;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.83rem;
+    cursor: pointer;
+    text-decoration: underline;
+    margin: 0 auto;
+  }
+
+  /* ── Note ── */
+  .note {
+    margin-top: 1.75rem;
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 17px; height: 17px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 440px) {
+    .card { padding: 1.5rem 1.25rem; }
+    .header h1 { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="tagline">#GCCWPA2026</span>
+  <h1>Generate Your<br>"I'm Attending" Card</h1>
+  <p>GCC Workplace Innovation Summit &amp; Awards 2026<br>30th &amp; 31st July · Hilton Embassy Manyata, Bengaluru</p>
+</div>
+
+<!-- Steps -->
+<div class="steps" id="stepsRow">
+  <div class="step active" id="step1">
+    <div class="step-num">1</div>
+    <div class="step-label">Upload</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="step2">
+    <div class="step-num">2</div>
+    <div class="step-label">Generate</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" id="step3">
+    <div class="step-num">3</div>
+    <div class="step-label">Download</div>
+  </div>
+</div>
+
+<!-- Upload card -->
+<div class="card">
+
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="photoInput" accept="image/*">
+    <span class="upload-icon">📸</span>
+    <h3>Upload your photo</h3>
+    <p>Any background is fine — we remove it automatically.<br>Selfies, professional photos, all work.</p>
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" src="" alt="Your photo">
+    <button class="change-btn" onclick="resetUpload()">Change photo</button>
+  </div>
+
+  <button class="btn-generate" id="generateBtn" onclick="generateCard()" disabled>
+    ✨ Generate My Card
+  </button>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="status" id="statusMsg"></div>
+
+</div>
+
+<!-- Result -->
+<div class="result-section" id="resultSection">
+  <h3>🎉 Your card is ready!</h3>
+  <img id="resultImg" src="" alt="Your attending card">
+  <a id="downloadLink" href="#" download="GCCWPA2026_IAmAttending.jpg" class="btn-download">
+    ⬇ Download Card
+  </a>
+  <button class="btn-another" onclick="fullReset()">Generate another card</button>
+</div>
+
+<p class="note">
+  Your photo is processed securely and never stored.<br>
+  Background is removed automatically — any photo works.
+</p>
+
+<script>
+  const photoInput   = document.getElementById('photoInput');
+  const uploadZone   = document.getElementById('uploadZone');
+  const previewWrap  = document.getElementById('previewWrap');
+  const previewImg   = document.getElementById('previewImg');
+  const generateBtn  = document.getElementById('generateBtn');
+  const statusMsg    = document.getElementById('statusMsg');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar  = document.getElementById('progressBar');
+  const resultSection= document.getElementById('resultSection');
+  const resultImg    = document.getElementById('resultImg');
+  const downloadLink = document.getElementById('downloadLink');
+
+  let selectedFile = null;
+
+  // ── Drag & drop ──────────────────────────────────────────────────────────────
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+  });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleFile(file);
+  });
+
+  photoInput.addEventListener('change', () => {
+    if (photoInput.files[0]) handleFile(photoInput.files[0]);
+  });
+
+  function handleFile(file) {
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      uploadZone.style.display  = 'none';
+      previewWrap.style.display = 'block';
+      generateBtn.disabled      = false;
+      setStatus('', '');
+      setStep(2);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetUpload() {
+    selectedFile      = null;
+    photoInput.value  = '';
+    uploadZone.style.display  = 'block';
+    previewWrap.style.display = 'none';
+    generateBtn.disabled      = true;
+    generateBtn.innerHTML     = '✨ Generate My Card';
+    setStatus('', '');
+    hideProgress();
+    setStep(1);
+  }
+
+  function fullReset() {
+    resetUpload();
+    resultSection.style.display = 'none';
+    resultImg.src    = '';
+    downloadLink.href = '#';
+  }
+
+  // ── Generate ─────────────────────────────────────────────────────────────────
+  async function generateCard() {
+    if (!selectedFile) return;
+
+    generateBtn.disabled  = true;
+    generateBtn.innerHTML = '<div class="spinner"></div> Removing background…';
+    setStatus('This takes about 15–20 seconds. Please wait.', '');
+    resultSection.style.display = 'none';
+    showProgress();
+
+    const formData = new FormData();
+    formData.append('photo', selectedFile);
+
+    // Animate progress bar (fake progress while waiting)
+    animateProgress(0, 70, 12000);
+
+    try {
+      const response = await fetch('/generate', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Server error' }));
+        throw new Error(err.error || 'Something went wrong');
+      }
+
+      animateProgress(70, 100, 1500);
+
+      const blob = await response.blob();
+      const url  = URL.createObjectURL(blob);
+
+      setTimeout(() => {
+        resultImg.src      = url;
+        downloadLink.href  = url;
+        resultSection.style.display = 'block';
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+
+        generateBtn.innerHTML = '✨ Generate My Card';
+        generateBtn.disabled  = false;
+        setStatus('', '');
+        hideProgress();
+        setStep(3);
+      }, 800);
+
+    } catch (err) {
+      setStatus(err.message, 'error');
+      generateBtn.innerHTML = '✨ Generate My Card';
+      generateBtn.disabled  = false;
+      hideProgress();
+    }
+  }
+
+  // ── Progress helpers ─────────────────────────────────────────────────────────
+  let progressTimer = null;
+
+  function showProgress() {
+    progressWrap.style.display = 'block';
+    progressBar.style.width    = '0%';
+  }
+
+  function hideProgress() {
+    progressWrap.style.display = 'none';
+    progressBar.style.width    = '0%';
+    clearTimeout(progressTimer);
+  }
+
+  function animateProgress(from, to, duration) {
+    clearTimeout(progressTimer);
+    const steps    = 40;
+    const interval = duration / steps;
+    const increment = (to - from) / steps;
+    let current = from;
+
+    function tick() {
+      current = Math.min(current + increment, to);
+      progressBar.style.width = current + '%';
+      if (current < to) progressTimer = setTimeout(tick, interval);
+    }
+    tick();
+  }
+
+  // ── Step indicator ───────────────────────────────────────────────────────────
+  function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('step' + i);
+      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    }
+  }
+
+  function setStatus(msg, type) {
+    statusMsg.textContent = msg;
+    statusMsg.className   = 'status' + (type ? ' ' + type : '');
+  }
+</script>
+</body>
+</html>
